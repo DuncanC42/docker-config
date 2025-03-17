@@ -1,0 +1,75 @@
+version: "2"
+services:
+   web:
+      image: php:8.2-apache
+      build: .
+      container_name: app_sf_web
+      networks:
+         - rezo_app_sf_web
+      ports:
+         - "8050:8000"
+      volumes:
+         - ../backend:/var/www/html
+   db:
+      image: mysql:5.7
+      container_name: app_sf_db
+      networks:
+         - rezo_app_sf_web
+         - rezo_app_sf_pma
+      volumes:
+         - mysql_data:/var/lib/mysql
+      environment:
+         - MYSQL_ROOT_PASSWORD=${MY_ROOT_PASSWORD}
+         - MYSQL_DATABASE=${MY_DATABASE}
+         - MYSQL_USER=${MY_USER}
+         - MYSQL_PASSWORD=${MY_PASSWORD}
+
+   pma:
+      image: phpmyadmin:5.2
+      container_name: app_sf_pma
+      networks:
+         - rezo_app_sf_pma
+      ports:
+         - "8060:80"
+      environment:
+         - PMA_HOST=db
+
+   frontend:
+      build:
+         context: ..
+         dockerfile: docker-config/Dockerfile_vue
+      container_name: app_vue_frontend
+      networks:
+         - rezo_app_sf_web
+      ports:
+         - "8080:8080"
+      volumes:
+         - ../frontend:/app
+      environment:
+         - NODE_ENV=development
+      # Ajouter cette commande pour installer les dépendances au démarrage
+      command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+
+   panel-admin:
+      build:
+         context: ..
+         dockerfile: docker-config/Dockerfile_vue_panelAdmin
+      container_name: panel_admin
+      networks:
+         - rezo_app_sf_web
+      ports:
+         - "8081:8081"
+      volumes:
+         - ../panelAdmin:/app
+      environment:
+         - NODE_ENV=development
+      # Ajouter cette commande pour installer les dépendances au démarrage
+      command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+
+networks:
+   rezo_app_sf_web:
+   rezo_app_sf_pma:
+
+volumes:
+   sf:
+   mysql_data:
