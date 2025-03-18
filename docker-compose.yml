@@ -1,9 +1,10 @@
-version: "2"
 services:
    web:
       image: php:8.2-apache
       build: .
       container_name: app_sf_web
+      env_file:
+         -  .env
       networks:
          - rezo_app_sf_web
       ports:
@@ -11,28 +12,32 @@ services:
       volumes:
          - ../backend:/var/www/html
    db:
-      image: mysql:5.7
+      image: postgres:14
       container_name: app_sf_db
+      ports:
+         - "5432:5432"
       networks:
          - rezo_app_sf_web
-         - rezo_app_sf_pma
+         - rezo_app_sf_pgadmin
       volumes:
-         - mysql_data:/var/lib/mysql
+         - postgres_data:/var/lib/postgresql/data
       environment:
-         - MYSQL_ROOT_PASSWORD=${MY_ROOT_PASSWORD}
-         - MYSQL_DATABASE=${MY_DATABASE}
-         - MYSQL_USER=${MY_USER}
-         - MYSQL_PASSWORD=${MY_PASSWORD}
+         - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+         - POSTGRES_DB=${POSTGRES_DB}
+         - POSTGRES_USER=${POSTGRES_USER}
+         - POSTGRES_ROOT_PASSWORD=${POSTGRES_ROOT_PASSWORD}
 
-   pma:
-      image: phpmyadmin:5.2
-      container_name: app_sf_pma
+   pgadmin:
+      image: dpage/pgadmin4
+      container_name: app_sf_pgadmin
       networks:
-         - rezo_app_sf_pma
+         - rezo_app_sf_pgadmin
       ports:
          - "8060:80"
       environment:
-         - PMA_HOST=db
+         - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+         - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+         - PGADMIN_CONFIG_SERVER_MODE=${PGADMIN_CONFIG_SERVER_MODE}
 
    frontend:
       build:
@@ -47,7 +52,6 @@ services:
          - ../frontend:/app
       environment:
          - NODE_ENV=development
-      # Ajouter cette commande pour installer les dépendances au démarrage
       command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
 
    panel-admin:
@@ -63,13 +67,12 @@ services:
          - ../panelAdmin:/app
       environment:
          - NODE_ENV=development
-      # Ajouter cette commande pour installer les dépendances au démarrage
       command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
 
 networks:
    rezo_app_sf_web:
-   rezo_app_sf_pma:
+   rezo_app_sf_pgadmin:
 
 volumes:
    sf:
-   mysql_data:
+   postgres_data:
