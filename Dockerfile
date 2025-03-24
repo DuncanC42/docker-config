@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 php:8.2-apache
+FROM --platform=linux/amd64 php:7.2-apache
 
 # Combinez toutes les installations de packages dans une seule commande RUN
 RUN apt-get update && apt-get install -y --no-install-recommends \
