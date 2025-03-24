@@ -1,6 +1,6 @@
 services:
    web:
-      image: php:8.2-apache
+      image: php:7.2-apache
       build: .
       container_name: app_sf_web
       env_file:
