@@ -1,81 +1,90 @@
 services:
-   web:
+   api:
       image: php:7.2-apache
-      build: .
-      container_name: app_sf_web
+      build:
+         context: .
+         dockerfile: ./api/Dockerfile
+      container_name: ${PROJECT_NAME:-app}_api
       env_file:
-         -  .env
+         - .env
       networks:
-         - rezo_app_sf_web
+         - app_network
       ports:
-         - "8050:8000"
+         - "${API_PORT:-8050}:8000"
       volumes:
-         - ../backend:/var/www/html
-         - ./entrypoint.sh:/usr/local/bin/entrypoint.sh
+         - ../:/var/www/html # api app path
+         - ./api/entrypoint.sh:/usr/local/bin/entrypoint.sh
       depends_on:
-         - db
-   db:
+         - database
+      restart: unless-stopped
+
+   database:
       image: postgres:14
-      container_name: app_sf_db
+      container_name: ${PROJECT_NAME:-app}_db
       ports:
-         - "5432:5432"
+         - "${DB_PORT:-5432}:5432"
       networks:
-         - rezo_app_sf_web
-         - rezo_app_sf_pgadmin
+         - app_network
+         - pgadmin_network
       volumes:
-         - postgres_data:/var/lib/postgresql/data
+         - db_data:/var/lib/postgresql/data
       environment:
          - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
          - POSTGRES_DB=${POSTGRES_DB}
          - POSTGRES_USER=${POSTGRES_USER}
-         - POSTGRES_ROOT_PASSWORD=${POSTGRES_ROOT_PASSWORD}
+      restart: unless-stopped
 
    pgadmin:
       image: dpage/pgadmin4
-      container_name: app_sf_pgadmin
+      container_name: ${PROJECT_NAME:-app}_pgadmin
       networks:
-         - rezo_app_sf_pgadmin
+         - pgadmin_network
       ports:
-         - "8060:80"
+         - "${PGADMIN_PORT:-8060}:80"
       environment:
          - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
          - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
-         - PGADMIN_CONFIG_SERVER_MODE=${PGADMIN_CONFIG_SERVER_MODE}
+         - PGADMIN_CONFIG_SERVER_MODE=${PGADMIN_CONFIG_SERVER_MODE:-False}
+      restart: unless-stopped
 
    frontend:
       build:
-         context: ..
-         dockerfile: docker-config/Dockerfile_vue
-      container_name: app_vue_frontend
+         context: .
+         dockerfile: ./frontend/Dockerfile
+      container_name: ${PROJECT_NAME:-app}_frontend
       networks:
-         - rezo_app_sf_web
+         - app_network
       ports:
-         - "8080:8080"
+         - "${FRONTEND_PORT:-8080}:8080"
       volumes:
-         - ../frontend:/app
+         - ../frontend:/app # frontend app path
       environment:
-         - NODE_ENV=development
+         - NODE_ENV=${NODE_ENV:-development}
       command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+      restart: unless-stopped
 
-   panel-admin:
+   admin:
       build:
-         context: ..
-         dockerfile: docker-config/Dockerfile_vue_panelAdmin
-      container_name: panel_admin
+         context: .
+         dockerfile: ./admin/Dockerfile
+      container_name: ${PROJECT_NAME:-app}_admin
       networks:
-         - rezo_app_sf_web
+         - app_network
       ports:
-         - "8081:8081"
+         - "${ADMIN_PORT:-8081}:8081"
       volumes:
-         - ../panelAdmin:/app
+         - ../panelAdmin:/app #admin app path
       environment:
-         - NODE_ENV=development
+         - NODE_ENV=${NODE_ENV:-development}
       command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+      restart: unless-stopped
 
 networks:
-   rezo_app_sf_web:
-   rezo_app_sf_pgadmin:
+   app_network:
+      name: ${PROJECT_NAME:-app}_network
+   pgadmin_network:
+      name: ${PROJECT_NAME:-app}_pgadmin_network
 
 volumes:
-   sf:
-   postgres_data:
+   db_data:
+      name: ${PROJECT_NAME:-app}_db_data

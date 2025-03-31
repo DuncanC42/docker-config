@@ -1,12 +1,12 @@
-FROM node:23
+FROM node:23-alpine
 
 WORKDIR /app
 
+# Utiliser une image Alpine pour réduire la taille
 # Les dépendances seront installées via le volume monté
-# Pas besoin de copier les fichiers car ils seront montés via le volume
 
 # Exposer le port
 EXPOSE 8081
 
-# Démarrer l'application en mode développement
+# L'application sera lancée via la commande dans docker-compose.yml
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
