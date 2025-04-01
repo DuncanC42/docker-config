@@ -68,6 +68,8 @@ services:
          context: .
          dockerfile: ./admin/Dockerfile
       container_name: ${PROJECT_NAME:-app}_admin
+      env_file:
+         - .env
       networks:
          - app_network
       ports:
