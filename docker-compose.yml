@@ -12,7 +12,7 @@ services:
       ports:
          - "${API_PORT:-8050}:8000"
       volumes:
-         - ../:/var/www/html # api app path
+         - ../apiCodeine:/var/www/html # api app path
          - ./api/entrypoint.sh:/usr/local/bin/entrypoint.sh
       depends_on:
          - database
