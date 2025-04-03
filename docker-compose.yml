@@ -11,6 +11,7 @@ services:
          - app_network
       ports:
          - "${API_PORT:-8050}:8000"
+         - "${WS_PORT:-8051}:8051"
       volumes:
          - ../apiCodeine:/var/www/html # api app path
          - ./api/entrypoint.sh:/usr/local/bin/entrypoint.sh

@@ -71,8 +71,10 @@ mkdir -p var public/uploads
 chmod -R 777 var public/uploads || echo "⚠️ Permission setting failed"
 echo "✅ Permissions set!"
 
-echo "🚀 Starting Symfony server..."
-symfony serve --allow-all-ip
+echo "🚀 Starting Symfony server and websocket..."
+symfony serve --allow-all-ip &
+php bin/console app:websocket:server
+
 
 # Démarrer Apache en cas d'échec de Symfony
 echo "⚠️ Symfony server failed, falling back to Apache..."
