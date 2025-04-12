@@ -52,10 +52,12 @@ if [ -f "bin/console" ]; then
     php bin/console doctrine:schema:update --force || echo "⚠️ Schema update failed"
     echo "✅ Schema update completed!"
 
-    # Charger les fixtures
-    echo "🔄 Loading fixtures data..."
-    php bin/console doctrine:fixtures:load --no-interaction || echo "⚠️ Fixtures loading failed"
-    echo "✅ Fixtures loaded successfully!"
+    # Charger les fixtures uniquement si SYMFONY_ENV n'est pas 'prod'
+    if [ "$SYMFONY_ENV" != "prod" ]; then
+        echo "🔄 Loading fixtures data..."
+        php bin/console doctrine:fixtures:load --no-interaction || echo "⚠️ Fixtures loading failed"
+        echo "✅ Fixtures loaded successfully!"
+    fi
 fi
 
 # Vider le cache Symfony en environnement de développement
