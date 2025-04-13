@@ -43,7 +43,7 @@ Nous avons également utilisé pour le versionning **GIT** avec quatre repositor
 Cf [Lien vers les repository](https://github.com/stars/DuncanC42/lists/sae-cpam)
 
 ### Accès et permissions
-Étant sur un environnement dockerisé il est tout à fait possible que vous ne puissiez executer certaines commandes de la manière traditionnelle. Pour la plus part des commandes vous devrez donc vous connecter au connecteur correspondant puis effectuer votre commande. Pour se faire :
+Étant sur un environnement dockerisé il est tout à fait possible que vous ne puissiez executer certaines commandes de la manière traditionnelle. Pour la plus part des commandes vous devrez donc vous connecter au conteneur correspondant puis effectuer votre commande. Pour se faire :
 ```sh
 # Repérez le nom du conteneur auquel sur lequel vous souhaitez effectuer la commande
 docker ps
@@ -52,7 +52,7 @@ docker ps
 docker exec -it <container_name/container_id> /bin/bash
 ```
 
-Il est possible que certains fichiers ne soient pas modifiables car créez par Root depuis le conteneur, si ça vous arrive un petit `chmod` vous aidera.
+Il est possible que certains fichiers ne soient pas modifiables car créé par Root depuis le conteneur, si ça vous arrive un petit `chmod` vous aidera.
 
 ## Détails des services exposés
 ### API
@@ -155,6 +155,7 @@ docker compose up -d # Pour le lancer en arrière plan
 
 Pour la mise en place de l'environnement de production vous devriez répété les mêmes étapes que pour l'environnement de développement **MAIS** en modifiant le fichier `.env` pour y mettre les bonnes valeurs ou au moins :
 ```sh
+URI=<vps-ip>
 NODE_ENV=production
 SYMFONY_ENV=prod
 ```
